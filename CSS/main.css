@@ -1,0 +1,175 @@
+/*=========================================================================================*/
+/*                                   Pre-Page Set Up                                           
+/*=========================================================================================*/
+
+@import url("https://fonts.googleapis.com/css?family=Press+Start+2P&display=swap");
+
+
+/*=========================================================================================*/
+/*                                    Title Style                                           
+/*=========================================================================================*/
+
+.title {
+    font-family: 'Press Start 2P', cursive;
+    background-color: dimgray;
+    height: 40px;
+    margin-top: 0px;
+    color: orangered;
+}
+
+
+/*=========================================================================================*/
+/*                                    Element Style                                           
+/*=========================================================================================*/
+
+h3 {
+    text-align: center;
+}
+  
+p {
+    margin: 0 auto;
+}
+
+body {
+    background-color: lightgray;
+}
+
+/*=========================================================================================*/
+/*                                    Player Style                                           
+/*=========================================================================================*/
+  
+.player_stats {
+    height: 100px;
+    width: 100%;
+    position: absolute;
+}
+  
+.player_stats .player_health, .player_mana {
+    width: 40%;
+    text-align: center;
+    float: left;
+    border-style: groove;
+    border-radius: 10px;
+}
+
+.player_name {
+    float: left;
+    margin-left: 100px;
+}
+
+  
+.player_health {
+    background-color: #ff3352;
+    color: rgb(4, 235, 23);
+}
+  
+.player_mana {
+    background-color: #0a07c0;
+    color: rgb(4, 235, 23);
+}
+
+/*=========================================================================================*/
+/*                                      Enemy Style                                           
+/*=========================================================================================*/
+
+.enemy_stats {
+    height: 100px;
+    width: 100%;
+    position: absolute;
+}
+
+.enemy_stats .enemy_health, .enemy_mana {
+    width: 40%;
+    text-align: center;
+    float: right;
+    border-style: groove;
+    border-radius: 10px;
+}
+
+.enemy_name {
+    float: right;
+    text-align: center;
+    width: 40%;
+}
+
+.enemy_health {
+    background-color: #ff3352;
+    color: rgb(4, 235, 23);
+}
+
+.enemy_mana {
+    background-color: #0a07c0;
+    color: rgb(4, 235, 23);
+}
+
+/*=========================================================================================*/
+/*                                         UI                                           
+/*=========================================================================================*/
+  
+.interactive_UI {
+    height: 120px;
+    width: 100%;
+    position: absolute;
+    background-color: goldenrod;
+    
+}
+  
+.interactive_UI .attack, .run, .defend, .abilities{
+    width: 22.5%;
+    display: block;
+    float: left;
+    text-align: center;
+    padding-top: 35px;
+    height: 80%;
+    border-style: solid;
+    margin-left: 13px;
+    padding-top: 0px;
+}
+
+/*=========================================================================================*/
+/*                                     Combat Style                                           
+/*=========================================================================================*/
+  
+.attack {
+    background-color: #ca1631;
+    box-shadow: 0px 0px 0px 2px rgba(0, 0, 0, 0.2) ;
+    transition: 0.2s linear;
+    margin: 0.5em;
+}
+  
+.attack:hover{
+    box-shadow: 0px 0px 0px 6px rgba(0, 0, 0, 0.7);
+}
+  
+.run {
+    background-color: #2995d4;
+    box-shadow: 0px 0px 0px 2px rgba(0, 0, 0, 0.2) ;
+    transition: 0.2s linear;
+    margin: 0.5em;
+}
+  
+.run:hover{
+    box-shadow: 0px 0px 0px 6px rgba(0, 0, 0, 0.7);
+}
+  
+.defend {
+    background-color: #1cbb0e;
+    box-shadow: 0px 0px 0px 2px rgba(0, 0, 0, 0.2) ;
+    transition: 0.2s linear;
+    margin: 0.5em;
+}
+  
+.defend:hover{
+    box-shadow: 0px 0px 0px 6px rgba(0, 0, 0, 0.7);
+}
+
+.abilities {
+    background-color: darkmagenta;
+    box-shadow: 0px 0px 0px 2px rgba(0, 0, 0, 0.2) ;
+    transition: 0.2s linear;
+    margin: 0.5em;
+}
+
+.abilities:hover{
+    box-shadow: 0px 0px 0px 6px rgba(0, 0, 0, 0.7);
+}
