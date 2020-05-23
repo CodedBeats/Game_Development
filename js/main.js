@@ -3,6 +3,7 @@
 //=========================================================================================//
 
 class Player {
+    name = "Player";
     hp = 100;
     mp = 100;
     maxHp = 100
@@ -11,23 +12,40 @@ class Player {
     missChance = 0.025;
     dodgeChance = 0.025;
 
+    statsEffects = {};
+
 
     isDead = false;
 
-    constructor() {
+    constructor(name) {
+        this.name = name;
+    }
 
+
+    updateDOM() {
+        let hpPercent = (this.hp * 100) / this.maxHp;
+
+        if(hpPercent >= 50) {
+            document.querySelector(".player-health").setAttribute("style","background-color: green");
+        } else if(hpPercent >= 25) {
+            document.querySelector(".player-health").setAttribute("style","background-color: orange");
+        } else if(hpPercent >= 10) {
+            document.querySelector(".player-health").setAttribute("style","background-color: red");
+        }
+
+        document.querySelector(".player-health").innerText = this.hp + "/" + this.maxHp;
     }
 
     attack(target) {
-        console.log ("the player attacks") 
+        combatLog (`${this.name} attacks`) 
 
         if(Math.random() < this.missChance) {
-            console.log("Big Swing, No Ding")
+            combatLog("Big Swing, No Ding")
             return
         }
 
         if(Math.random() < target.dodgeChance) {
-            console.log(`The ${target.enemyName} evaded your attack`)
+            combatLog(`The ${target.name} evaded your attack`)
             return
         }
 
@@ -35,14 +53,20 @@ class Player {
 
         if(Math.random() < this.criticalChance) {
             damageAmount *= 1.5
-            console.log("You landed a critical hit")
+            combatLog("You landed a critical hit")
         } 
 
         target.applyDamage(damageAmount);
     }
-    defend() {
 
+
+    defend() {
+        combatLog (`${this.name} defends`)
+
+        this.statsEffects.defending = true;
     }
+
+
     useSkill(skill) {
 
     }
@@ -54,16 +78,22 @@ class Player {
         this.hp -= damageAmount 
         this.hp = Math.max(0, this.hp)
 
-        document.querySelector(".player_health").innerText = this.hp + "/" + this.maxHp;
+        this.updateDOM()
 
-        console.log(`The player takes ${damageAmount} damage, players health is now ${this.hp}` )
+        const hpPercent = (this.hp * 100) / this.maxHp;
+
+        combatLog(`The player takes ${damageAmount} damage, players health is now ${this.hp}` )
 
         if(this.hp <= 0) {
             this.isDead = true
-            console.log("The Player perishes")
+            combatLog(`${this.name} perishes`)
         }
-    }    
+    } 
+    
 }
+
+
+
 
 
 
@@ -85,57 +115,103 @@ class Enemy {
     criticalChance = 0.05;
     missChance = 0.025;
     dodgeChance = 0.025;
-    enemyName = "Enemy"
+    dmgMax = 20;
+    dmgMin = 1;
+    name = "Enemy"
 
-    constructor() {
+    statsEffects = {};
 
+    isWindingUp = false;
+    windUpTarget = null;
+
+    constructor(name, hp, dmgMin, dmgMax) {
+        this.name = name;
+        this.hp = hp;
+        this.dmgMin = dmgMin;
+        this.dmgMax = dmgMax;
+ 
+    }
+
+    updateDOM() {
+        const hpPercent = (this.hp * 100) / this.maxHp;
+
+        if(hpPercent >= 50) {
+            document.querySelector("#enemy-stats").setAttribute("style","background-color: green");
+        } else if(hpPercent >= 10) {
+            document.querySelector("#enemy-stats").setAttribute("style","background-color: orange");
+        } else {
+            document.querySelector("#enemy-stats").setAttribute("style","background-color: red");
+        }
+
+        document.querySelector("#enemy-stats").innerText = this.hp + "/" + this.maxHp;
+    }
+
+    
+    slowPunch(target) {
+        if(this.isWindingUp == false) {
+            this.isWindingUp = true;
+            this.windUpTarget = target;
+            combatLog(`${this.name} is winding up`)
+            return
+        }
+        this.isWindingUp = false;
+        let damageAmount = this.windUpTarget.maxHp / 3;
+        this.windUpTarget.applyDamage(damageAmount);
+        combatLog(`${this.name} deliveres a powerful blow of `)
     }
 
 
     attack(target) {
-        console.log (`the ${this.enemyName} attacks`)
+        combatLog (`the ${this.name} attacks`)
 
         if(Math.random() < this.missChance) {
-            console.log("Big Swing, No Ding")
+            combatLog("Big Swing, No Ding")
             return
         }
 
         if(Math.random() < target.dodgeChance) {
-            console.log("The Player evaded your attack"/* replace player name with ${LOL} */)
+            combatLog(`${this.name} evaded your attack`/* replace player name with ${LOL} */)
             return
         }
 
-        let damageAmount = rollNumber(20, 5)
+        let damageAmount = rollNumber(this.dmgMax, this.dmgMin)
 
         if(Math.random() < this.criticalChance) {
             damageAmount *= 1.5
-            console.log(`The ${this.enemyName} landed a critical hit`)
+            combatLog(`The ${this.name} landed a critical hit`)
         }
 
         target.applyDamage(damageAmount);
     }
 
-    defend() {
 
+    defend() {
+        combatLog (`the ${this.name} defends`)
+
+        this.statsEffects.defending = true;
     }
+
+
     useSkill(skill) {
         
     }
 
     applyDamage(damageAmount) {
-        //player's hp = enemy damage * a bunch of if's
-        damageAmount = Math.round(damageAmount)
+        if(this.statsEffects.defending == true) {
+            damageAmount *= 0.6;
+        }
 
+        damageAmount = Math.round(damageAmount)
         this.hp -= damageAmount 
         this.hp = Math.max(0, this.hp)
 
-        document.querySelector(".enemy_health").innerText = this.hp + "/" + this.maxHp;
+        this.updateDOM()
         
-        console.log(`The ${this.enemyName} takes ${damageAmount} damage, ${this.enemyName} health is now ${this.hp}` )
+        combatLog(`The ${this.name} takes ${damageAmount} damage, ${this.name} health is now ${this.hp}` )
 
         if(this.hp <= 0) {
             this.isDead = true
-            console.log(`The ${this.enemyName} perishes`)
+            combatLog(`The ${this.name} perishes`)
         }
     } 
 
@@ -151,12 +227,10 @@ class Enemy {
 //=========================================================================================//
 
 let playerRun = function() {
-    console.log("you are too useless")
+    combatLog("you are too useless")
 }
 
-let PlayerDefend = function() {
-    console.log("you dont have legs, gotta earn em")
-}
+
 
 
 
@@ -208,34 +282,55 @@ class Combat {
         }
 
         if(this.isEnded === true) {
-            console.log("Combat Ends")
+            combatLog("Combat Ends")
             return;
         }
 
         //set next turn
         if(this.whosTurn == this.player) {
             this.whosTurn = this.enemy
-            console.log("Enemy's Turn")
-            this.enemyAttack();
+            combatLog("Enemy's Turn")
+            this.enemyTurn();
         } else {
             this.whosTurn = this.player
-            console.log("Player's Turn")
+            combatLog(`${this.player.name}'s Turn`)
         }
     }
 
-    playerAttack = function() {
+    playerTurn = function(action) {
         if(this.isEnded) {
             return
         }
-        this.player.attack(enemy);
+
+        if(action == "attack") {
+            this.player.attack(enemy);
+        } 
+        else if(action == "defend") {
+            this.player.defend();
+        }
+        
         
         //done with code
         combat.endTurn();
     }
 
-    enemyAttack = function() {
-        enemy.attack(player);
-
+//                                             New Code
+    enemyTurn = function() {
+        if(this.enemy.isWindingUp = true) {
+            enemy.slowPunch()
+            combat.endTurn();
+            return
+        } 
+        let slowPunchChance = math.Random() < 0.2;
+        if(slowPunchChance == true) {
+            enemy.slowPunch(player);
+        } 
+        else if(this.enemy.hp < 30) {
+            enemy.defend(player);
+        } else {
+            enemy.attack(player);
+        }
+        
         combat.endTurn();
     }
 
@@ -243,7 +338,7 @@ class Combat {
 
 
 
-
+ 
 
 
 
@@ -252,12 +347,11 @@ class Combat {
 //                                      Initiate                                           //
 //=========================================================================================//
 
-const player = new Player();
-const enemy = new Enemy();
+const player = new Player("Mr Kool");
+const enemy = new Enemy("Kobold", 100, 1, 20, 10);
 const combat = new Combat(player, enemy);
 
-enemy.enemyName = "Ogre"
-document.querySelector(".enemy_name").innerText = enemy.enemyName;
+document.querySelector("#enemy-name").innerText = enemy.name;
 
 
 
@@ -283,3 +377,26 @@ const rollNumber = function(min, max) {
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min)) + min;
 }
+
+const combatLog = function(logText) {
+    console.log(logText)
+    //  document.querySelector("#log-output").innerText = logText;
+    //  document.querySelector("#log-output").innerHTML += logText + "<br>";
+    document.querySelector("#log-output").innerHTML = logText + "<br>" + document.querySelector("#log-output").innerHTML 
+}
+
+
+
+
+
+
+
+
+
+
+
+//=========================================================================================//
+//          Test            Test           Test             Test             Test          //
+//=========================================================================================//
+
+
