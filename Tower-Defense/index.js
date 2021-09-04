@@ -113,6 +113,9 @@ canvas.addEventListener("click", function() {
     const gridPositionX = mouse.x - (mouse.x % cellSize)
     const gridPositionY = mouse.y - (mouse.y % cellSize)
     if (gridPositionY < cellSize) { return }
+    for (let i = 0; i < defenders.length; i++) {
+        if (defenders[i].x === gridPositionX && defenders[i].y === gridPositionY) { return }
+    }
     let defenderCost = 100;
     if (resourcesCount >= defenderCost) {
         defenders.push(new Defender(gridPositionX, gridPositionY));
@@ -142,12 +145,19 @@ function handleDefenders() {
 
 
 //====================== Utilities ======================//
+function handleGameSatus() {
+    ctx.fillStyle = "gold";
+    ctx.font = "30px Arial";
+    ctx.fillText(`Resources: ${resourcesCount}`, 20, 60)
+}
+
 function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "blue";
     ctx.fillRect(0, 0, gameControlsBar.width, gameControlsBar.height);
     handleGameGrid();
     handleDefenders();
+    handleGameSatus();
     requestAnimationFrame(animate);
 }
 animate();
