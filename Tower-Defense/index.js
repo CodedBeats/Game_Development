@@ -11,6 +11,8 @@ canvas.height = 600;
 const cellSize = 100;
 const cellGap = 3;
 const gameGrid = [];
+const defenders = [];
+let resourcesCount = 300; // initial given resource or money amount
 
 
 
@@ -51,22 +53,24 @@ class Cell {
         this.height = cellSize;
     }
     draw() {
-        if (collision(this, mouse)) {
+        if (mouse.x && mouse.y && collision(this, mouse)) {
             ctx.strokeStyle = "black";
             ctx.strokeRect(this.x, this.y, this.width, this.height);
         }
     }
 }
+
 function createGrid() {
-    for(let y = cellSize; y < canvas.height; y += cellSize) {
-        for(let x = 0; x < canvas.width; x += cellSize) {
+    for (let y = cellSize; y < canvas.height; y += cellSize) {
+        for (let x = 0; x < canvas.width; x += cellSize) {
             gameGrid.push(new Cell(x, y));
         }
     }
 }
 createGrid()
+
 function handleGameGrid() {
-    for(let i = 0; i < gameGrid.length; i++) {
+    for (let i = 0; i < gameGrid.length; i++) {
         gameGrid[i].draw();
     }
 }
@@ -78,7 +82,54 @@ function handleGameGrid() {
 //====================== Projectiles ======================//
 
 
-//====================== Towers ======================//
+
+
+//====================== Defenders ======================//
+// class for creating new "defender" or "tower"
+class Defender {
+    // x and y as coordinates
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.width = cellSize;
+        this.height = cellSize;
+        this.shooting = false; // default state
+        this.health = 100; // starting health
+        this.projectiles = [];
+        this.timer = 0;
+    }
+    draw() {
+        ctx.fillStyle = "blue";
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+        ctx.fillStyle = "gold";
+        ctx.font = "30px Arial"
+        ctx.fillText(Math.floor(this.health), this.x + 15, this.y + 30) // health wrapped in Math.floor() so we only use whole numbers
+    }
+}
+
+// snapping the placement to the closest grid space to the left
+canvas.addEventListener("click", function() {
+    // "%" (modulas) is an operator that returns the remainder if these 2 were divided (/)
+    const gridPositionX = mouse.x - (mouse.x % cellSize)
+    const gridPositionY = mouse.y - (mouse.y % cellSize)
+    if (gridPositionY < cellSize) { return }
+    let defenderCost = 100;
+    if (resourcesCount >= defenderCost) {
+        defenders.push(new Defender(gridPositionX, gridPositionY));
+        resourcesCount -= defenderCost;
+    }
+});
+
+function handleDefenders() {
+    for (let i = 0; i < defenders.length; i++) {
+        defenders[i].draw()
+    }
+}
+
+
+
+
+
 
 
 //====================== Enemies ======================//
@@ -92,10 +143,11 @@ function handleGameGrid() {
 
 //====================== Utilities ======================//
 function animate() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "blue";
     ctx.fillRect(0, 0, gameControlsBar.width, gameControlsBar.height);
     handleGameGrid();
+    handleDefenders();
     requestAnimationFrame(animate);
 }
 animate();
