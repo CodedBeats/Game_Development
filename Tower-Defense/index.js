@@ -107,7 +107,7 @@ class Defender {
         ctx.fillStyle = "blue";
         ctx.fillRect(this.x, this.y, this.width, this.height);
         ctx.fillStyle = "gold";
-        ctx.font = "30px Arial"
+        ctx.font = "30px Orbitron"
         ctx.fillText(Math.floor(this.health), this.x + 15, this.y + 30) // health wrapped in Math.floor() so we only use whole numbers
     }
 }
@@ -130,7 +130,20 @@ canvas.addEventListener("click", function() {
 
 function handleDefenders() {
     for (let i = 0; i < defenders.length; i++) {
-        defenders[i].draw()
+        defenders[i].draw();
+        for (let j = 0; j < defenders.length; j++) {
+            // check if an enemy has reached a defender
+            if (collision(defenders[i], enemies[j])) {
+                enemies[j].movement = 0; // enemy stops moving
+                defenders[i].health -= 0.2; // defender gets gradually damaged by enemy
+            }
+            // if defender is dead
+            if (defenders[i] && defenders[i].health <= 0) {
+                defenders.splice(i, 1); // remove 1 element at this index
+                i--; // this makes sure the next element in the array doesn't get skipped
+                enemies[j].movement = enemies[j].speed;
+            }
+        }
     }
 }
 
@@ -160,7 +173,7 @@ class Enemy {
         ctx.fillStyle = "red";
         ctx.fillRect(this.x, this.y, this.width, this.height);
         ctx.fillStyle = "black";
-        ctx.font = "30px Arial"
+        ctx.font = "30px Orbitron"
         ctx.fillText(Math.floor(this.health), this.x + 15, this.y + 30) // health wrapped in Math.floor() so we only use whole numbers
     }
 }
@@ -196,11 +209,11 @@ function handleEnemies() {
 //====================== Utilities ======================//
 function handleGameSatus() {
     ctx.fillStyle = "gold";
-    ctx.font = "30px Arial";
+    ctx.font = "30px Orbitron";
     ctx.fillText(`Resources: ${resourcesCount}`, 20, 60)
     if (gameOver) {
         ctx.fillStyle = "black";
-        ctx.font = "60px Arial";
+        ctx.font = "90px Orbitron";
         ctx.fillText("GAME OVER", 135, 330)
     }
 }
