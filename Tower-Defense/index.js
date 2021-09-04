@@ -12,7 +12,12 @@ const cellSize = 100;
 const cellGap = 3;
 const gameGrid = [];
 const defenders = [];
+const enemies = [];
+const enemyPositions = [];
+let enemiesInterval = 600;
 let resourcesCount = 300; // initial given resource or money amount
+let frame = 0;
+let gameOver = false; // starts as false only to have state changed by end, this helps optimization
 
 
 
@@ -136,6 +141,50 @@ function handleDefenders() {
 
 
 //====================== Enemies ======================//
+// class for creating new enemies
+class Enemy {
+    constructor(verticalPosition) {
+        this.x = canvas.width;
+        this.y = verticalPosition;
+        this.width = cellSize;
+        this.height = cellSize;
+        this.speed = Math.random() * 0.2 + 0.4;
+        this.movement = this.speed;
+        this.health = 100;
+        this.maxHealth = this.health; // this is defined twice because the damage needs to be stored by changing reducing health, helps with rewarding resources  
+    }
+    update() {
+        this.x -= this.movement;
+    }
+    draw() {
+        ctx.fillStyle = "red";
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+        ctx.fillStyle = "black";
+        ctx.font = "30px Arial"
+        ctx.fillText(Math.floor(this.health), this.x + 15, this.y + 30) // health wrapped in Math.floor() so we only use whole numbers
+    }
+}
+
+function handleEnemies() {
+    for (let i = 0; i < enemies.length; i++) {
+        enemies[i].update();
+        enemies[i].draw();
+        if (enemies[i].x < 0) {
+            gameOver = true;
+        }
+    }
+    if (frame % enemiesInterval ===0) {
+        let verticalPosition = Math.floor(Math.random() * 5 + 1) * cellSize // place enemies on their rows
+        enemies.push(new Enemy(verticalPosition))
+        enemyPositions.push(verticalPosition)
+        if (enemiesInterval > 120) {enemiesInterval -= 50 } // speeds up the enemy spawn rate as time goes on
+    }
+}
+
+
+
+
+
 
 
 //====================== Recources ======================//
@@ -149,6 +198,11 @@ function handleGameSatus() {
     ctx.fillStyle = "gold";
     ctx.font = "30px Arial";
     ctx.fillText(`Resources: ${resourcesCount}`, 20, 60)
+    if (gameOver) {
+        ctx.fillStyle = "black";
+        ctx.font = "60px Arial";
+        ctx.fillText("GAME OVER", 135, 330)
+    }
 }
 
 function animate() {
@@ -157,8 +211,11 @@ function animate() {
     ctx.fillRect(0, 0, gameControlsBar.width, gameControlsBar.height);
     handleGameGrid();
     handleDefenders();
+    handleEnemies();
     handleGameSatus();
-    requestAnimationFrame(animate);
+    frame++;
+    // console.log(frame)
+    if (!gameOver) { requestAnimationFrame(animate) };
 }
 animate();
 
