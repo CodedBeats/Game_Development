@@ -15,6 +15,26 @@ const gameGrid = [];
 
 
 
+//====================== Mouse ======================//
+// x and y as coordinates
+const mouse = {
+    x: 10, 
+    y: 10,
+    width: 0.1,
+    height: 0.1,
+}
+let canvasPostion = canvas.getBoundingClientRect();
+// e = event
+canvas.addEventListener("mousemove", function(e) {
+    mouse.x = e.x - canvasPostion.left;
+    mouse.y = e.y - canvasPostion.top;
+});
+canvas.addEventListener("mouseleave", function() {
+    mouse.x = undefined;
+    mouse.y = undefined;
+})
+// console.log(canvasPostion);
+
 
 
 //====================== Game Board ======================//
@@ -31,8 +51,10 @@ class Cell {
         this.height = cellSize;
     }
     draw() {
-        ctx.strokeStyle = "black";
-        ctx.strokeRect(this.x, this.y, this.width, this.height);
+        if (collision(this, mouse)) {
+            ctx.strokeStyle = "black";
+            ctx.strokeRect(this.x, this.y, this.width, this.height);
+        }
     }
 }
 function createGrid() {
@@ -70,9 +92,24 @@ function handleGameGrid() {
 
 //====================== Utilities ======================//
 function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
     ctx.fillStyle = "blue";
     ctx.fillRect(0, 0, gameControlsBar.width, gameControlsBar.height);
     handleGameGrid();
     requestAnimationFrame(animate);
 }
 animate();
+
+//trying to see if a collision is true
+function collision(first, second) {
+    if (
+        !(
+            first.x > second.x + second.width ||
+            first.x + first.width < second.x ||
+            first.y > second.y + second.height ||
+            first.y + first.height < second.y
+        )
+    ) {
+        return true
+    };
+};
