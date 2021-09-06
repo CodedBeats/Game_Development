@@ -294,11 +294,12 @@ class Combat {
         } else {
             this.whosTurn = this.player
             combatLog(`${this.player.name}'s Turn`)
+            this.playerTurn();
         }
     }
 
     playerTurn = function(action) {
-        if(this.isEnded) {
+        if(this.isEnded == true) {
             return
         }
 
@@ -314,7 +315,7 @@ class Combat {
         combat.endTurn();
     }
 
-//                                             New Code
+//                                             Enemy Turn
     enemyTurn = function() {
         if(this.enemy.isWindingUp = true) {
             enemy.slowPunch()
@@ -380,7 +381,6 @@ const rollNumber = function(min, max) {
 
 const combatLog = function(logText) {
     console.log(logText)
-    //  document.querySelector("#log-output").innerText = logText;
     //  document.querySelector("#log-output").innerHTML += logText + "<br>";
     document.querySelector("#log-output").innerHTML = logText + "<br>" + document.querySelector("#log-output").innerHTML 
 }

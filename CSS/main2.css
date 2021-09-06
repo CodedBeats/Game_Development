@@ -1,10 +1,9 @@
 body {
     display: grid;
     grid-template-rows: 50% 50%;
-    background-color: black;
+    background-color: #292929;
+    /* put the page around it in a more DS style */
 }
-
-
 
 /*=========================================================================================*/
 /*                                      Top Screen                                           
@@ -22,7 +21,7 @@ body {
 }
 
 #enemy-stats {
-    background-color: chartreuse;
+    background-color: green;
     text-align: center;
     border-style: groove;
     border-radius: 30px;
@@ -39,7 +38,7 @@ body {
 
 /*====================================   Combat Log   ====================================*/
 #combat-log {
-    background-color: darkgray;
+    background-color: rgb(128, 128, 128);
     border-style: double;
     overflow: hidden;
 }
@@ -56,7 +55,7 @@ body {
 /*=========================================================================================*/
 #bottom-screen {
     display: grid;
-    grid-template-rows: 1fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
     background-color: darkgreen;
 }
 
@@ -65,13 +64,13 @@ body {
 .party-member-row {
     display: grid;
     grid-template-columns: 1fr 2fr;
-    background-color: firebrick;
+    background-color: #70a0a0;
 }
 
 /*====================================   Party Member Stats   ===========================================*/
 .party-member-stats {
     display: grid;
-    grid-template-rows: 20% 35% 35% 10%;
+    grid-template-rows: 35% 65%;
     background-color: gold;
     text-align: center;
     margin: 5px;
@@ -83,21 +82,17 @@ body {
 }
 
 .player-health {
+    background-color: green;
     border-style: solid; 
     border-radius: 40px;
     margin-bottom: 10px;
 }
 
-.player-mana {
-    border-style: solid; 
-    border-radius: 40px;
-    margin-bottom: 10px;
-}
 
 /*====================================   Party Member Moves   ===========================================*/
 .combat-options {
     display: grid;
-    grid-template-rows: 1fr 1fr;
+    grid-template-rows: 1fr;
     grid-template-columns: 1fr 1fr;
     background-color: indianred;
     margin: 5px;
@@ -122,26 +117,6 @@ body {
 }
 
 .player-defend:hover {
-    box-shadow: 0px 0px 0px 6px rgba(0, 0, 0, 0.7);
-}
-
-.player-abilities {
-    transition: 0.2s linear;
-    box-shadow: 0px 0px 0px 2px rgb(0, 0, 0);
-    margin: 0.3em;
-}
-
-.player-abilities:hover {
-    box-shadow: 0px 0px 0px 6px rgba(0, 0, 0, 0.7);
-}
-
-.miscellaneous {
-    transition: 0.2s linear;
-    box-shadow: 0px 0px 0px 2px rgba(0, 0, 0, 0.5);
-    margin: 0.3em;
-}
-
-.miscellaneous:hover {
     box-shadow: 0px 0px 0px 6px rgba(0, 0, 0, 0.7);
 }
 
