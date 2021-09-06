@@ -1,6 +1,6 @@
 //====================== Set Up Canvas ======================//
 const canvas = document.getElementById("canvas1");
-// ctx = context
+// ctx means context
 const ctx = canvas.getContext("2d");
 canvas.width = 900;
 canvas.height = 600;
@@ -77,7 +77,7 @@ function createGrid() {
         }
     }
 }
-createGrid()
+createGrid();
 
 function handleGameGrid() {
     for (let i = 0; i < gameGrid.length; i++) {
@@ -258,7 +258,7 @@ function handleEnemies() {
             let gainedResources = enemies[i].maxHealth / 10;
             resourcesCount += gainedResources; // rewards the player with resources for each vanquished foe
             score += gainedResources;
-            const findThisIndex = enemyPositions.indexOf(enemies[i].y)
+            const findThisIndex = enemyPositions.indexOf(enemies[i].y);
             enemyPositions.splice(findThisIndex, 1);
             enemies.splice(i, 1); // remove 1 element at this index
             i--; // this makes sure the next element in the array doesn't get skipped
@@ -324,8 +324,8 @@ function handleResources() {
 function handleGameSatus() {
     ctx.fillStyle = "gold";
     ctx.font = "30px Orbitron";
-    ctx.fillText(`Score: ${score}`, 20, 40)
-    ctx.fillText(`Resources: ${resourcesCount}`, 20, 80)
+    ctx.fillText(`Score: ${score}`, 20, 40);
+    ctx.fillText(`Resources: ${resourcesCount}`, 20, 80);
     if (gameOver) {
         ctx.fillStyle = "black";
         ctx.font = "90px Orbitron";
