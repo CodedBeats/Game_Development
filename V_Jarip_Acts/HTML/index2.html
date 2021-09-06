@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../css/main2.css">
+</head>
+<body>
+    <div id="top-screen"> 
+        <div id="enemy-name">
+            <p>Im better</p>
+        </div>
+        <div id="enemy-stats">            
+            <p>100/100</p>
+        </div>
+        <div id="combat-visuals">
+            <p>(^_^)</p>
+        </div>
+        <div id="combat-log">
+            <p id="log-output"></p>
+        </div>
+    </div>
+
+    <div id="bottom-screen">
+        <div class="party-member-row">
+            <div class="party-member-stats">
+                <div class="player-name">
+                    <p>Steve Jobs (Lv 69)</p>
+                </div>
+                <div class="player-health">
+                    <p>100/100</p>
+                </div>
+            </div>
+
+            <div class="combat-options">
+                <div class="player-attack" onclick="combat.playerTurn('attack')">
+                    <p>Attack</p>
+                </div>
+                <div class="player-defend" onclick="combat.playerTurn('defend')"><p>Defend</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+    <script>
+        document.querySelector("body").style.height = window.innerHeight + "px";
+    </script>
+    <script src="../js/main.js"></script>
+</body>
+</html>
