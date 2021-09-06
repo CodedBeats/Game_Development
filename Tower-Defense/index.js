@@ -15,7 +15,7 @@ let resourcesCount = 300; // initial given resource or money amount
 let frame = 0;
 let gameOver = false; 
 let score = 0;
-const winningScore = 50;
+const winningScore = 10;
 
 const gameGrid = [];
 const defenders = [];
