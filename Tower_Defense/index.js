@@ -15,7 +15,7 @@ let resourcesCount = 300; // initial given resource or money amount
 let frame = 0;
 let gameOver = false; 
 let score = 0;
-const winningScore = 10;
+const winningScore = 200;
 
 const gameGrid = [];
 const defenders = [];
@@ -138,6 +138,53 @@ function handleProjectiles() {
 
 
 
+
+//====================== Floating Messages ======================//
+
+const floatingMessages = [];
+
+class FloatingMessage {
+    constructor(value, x, y, size, color) {
+        this.value = value;
+        this.x = x;
+        this.y = y;
+        this.size = size;
+        this.lifeSpan = 0; // lifeSpan used as a timer for the text
+        this.color = color; // have different colored messages
+        this.opacity = 1;
+    }
+    update() {
+        this.y -= 0.3; // text slowly floats up
+        this.lifeSpan += 1; 
+        if (this.opacity > 0.03) {
+            this.opacity -= 0.03; // text fades away
+        }
+    }
+    draw() {
+        ctx.globalAlpha = this.opacity;
+        ctx.fillStyle = this.color;
+        ctx.font = `${this.style}px Orbitron`;
+        ctx.fillText(this.value, this.x, this.y);
+        ctx.globalAlpha = 1;
+    }
+}
+
+function handleFloatingMessages() {
+    for (let i = 0; i < floatingMessages.length; i++) {
+        floatingMessages[i].update();
+        floatingMessages[i].draw();
+        if (floatingMessages[i].lifeSpan >= 50) {
+            floatingMessages.splice(i, 1); // remove 1 element at this index
+            i--; // this makes sure the next element in the array doesn't get skipped
+        }
+    }
+}
+
+
+
+
+
+
 //====================== Defenders ======================//
 // class for creating new "defender" or "tower"
 class Defender {
@@ -171,22 +218,6 @@ class Defender {
     }
 }
 
-// snapping the placement to the closest grid space to the left
-canvas.addEventListener("click", function() {
-    // "%" (modulas) is an operator that returns the remainder if these 2 were divided (/)
-    const gridPositionX = mouse.x - (mouse.x % cellSize) + cellGap;
-    const gridPositionY = mouse.y - (mouse.y % cellSize) + cellGap;
-    if (gridPositionY < cellSize) { return }
-    for (let i = 0; i < defenders.length; i++) {
-        if (defenders[i].x === gridPositionX && defenders[i].y === gridPositionY) { return }
-    }
-    let defenderCost = 100;
-    if (resourcesCount >= defenderCost) {
-        defenders.push(new Defender(gridPositionX, gridPositionY));
-        resourcesCount -= defenderCost;
-    }
-});
-
 function handleDefenders() {
     for (let i = 0; i < defenders.length; i++) {
         defenders[i].draw();
@@ -199,7 +230,7 @@ function handleDefenders() {
             defenders[i].shooting = false;
         }
 
-        for (let j = 0; j < defenders.length; j++) {
+        for (let j = 0; j < enemies.length; j++) {
             // check if an enemy has reached a defender
             if (defenders[i] && collision(defenders[i], enemies[j])) {
                 enemies[j].movement = 0; // enemy stops moving
@@ -209,7 +240,7 @@ function handleDefenders() {
             if (defenders[i] && defenders[i].health <= 0) {
                 defenders.splice(i, 1); // remove 1 element at this index
                 i--; // this makes sure the next element in the array doesn't get skipped
-                enemies[j].movement = enemies[j].speed;
+                enemies[j].movement = enemies[j].speed; // enemy starts moving again
             }
         }
     }
@@ -256,6 +287,8 @@ function handleEnemies() {
         // check if enemy's health has reached 0 (damaged by projectiles)
         if (enemies[i].health <= 0) {
             let gainedResources = enemies[i].maxHealth / 10;
+            floatingMessages.push(new FloatingMessage(`+${gainedResources}`, enemies[i].x, enemies[i].y, 30, "black"))
+            floatingMessages.push(new FloatingMessage(`+${gainedResources}`, 250, 50, 30, "gold"))
             resourcesCount += gainedResources; // rewards the player with resources for each vanquished foe
             score += gainedResources;
             const findThisIndex = enemyPositions.indexOf(enemies[i].y);
@@ -308,6 +341,8 @@ function handleResources() {
 
         if (resources[i] && mouse.x && mouse.y && collision(resources[i], mouse)) {
             resourcesCount += resources[i].amount;
+            floatingMessages.push(new FloatingMessage(`+${resources[i].amount}`, resources[i].x, resources[i].y, 30, "black"));
+            floatingMessages.push(new FloatingMessage(`+${resources[i].amount}`, 250, 50, 30, "gold"))
             resources.splice(i, 1);
             i--;
         }
@@ -340,6 +375,28 @@ function handleGameSatus() {
     }
 }
 
+
+
+// snapping the placement to the closest grid space to the left
+canvas.addEventListener("click", function() {
+    // "%" (modulas) is an operator that returns the remainder if these 2 were divided (/)
+    const gridPositionX = mouse.x - (mouse.x % cellSize) + cellGap;
+    const gridPositionY = mouse.y - (mouse.y % cellSize) + cellGap;
+    if (gridPositionY < cellSize) { return }
+    for (let i = 0; i < defenders.length; i++) {
+        if (defenders[i].x === gridPositionX && defenders[i].y === gridPositionY) { return }
+    }
+    let defenderCost = 100;
+    if (resourcesCount >= defenderCost) {
+        defenders.push(new Defender(gridPositionX, gridPositionY));
+        resourcesCount -= defenderCost;
+    } else {
+        floatingMessages.push(new FloatingMessage("Need More Resources", mouse.x, mouse.y, 15, "cyan"));
+    }
+});
+
+
+
 function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "blue";
@@ -350,6 +407,7 @@ function animate() {
     handleProjectiles();
     handleEnemies();
     handleGameSatus();
+    handleFloatingMessages();
     frame++;
     // console.log(frame)
     if (!gameOver) { requestAnimationFrame(animate) };
