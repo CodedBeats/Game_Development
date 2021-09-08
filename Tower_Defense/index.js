@@ -16,6 +16,7 @@ let frame = 0;
 let gameOver = false; 
 let score = 0;
 const winningScore = 500;
+let chosenDefender = 1;
 
 const gameGrid = [];
 const defenders = [];
@@ -34,7 +35,16 @@ const mouse = {
     y: 10,
     width: 0.1,
     height: 0.1,
+    clicked: false,
 }
+
+canvas.addEventListener("mousedown", function() {
+    mouse.clicked = true;
+})
+canvas.addEventListener("mouseup", function() {
+    mouse.clicked = false;
+})
+
 let canvasPostion = canvas.getBoundingClientRect();
 // e = event
 canvas.addEventListener("mousemove", function(e) {
@@ -187,13 +197,13 @@ function handleFloatingMessages() {
 
 //====================== Defenders ======================//
 
-const DefenderTypes = [ ];
+const defenderTypes = [ ];
 const robotHero = new Image();
 robotHero.src = "./sprites/Compacted-Sprites/Heroes/robot-hero.png";
-DefenderTypes.push(robotHero);
+defenderTypes.push(robotHero);
 const alienHero = new Image();
 alienHero.src = "./sprites/Compacted-Sprites/Heroes/alien-hero1.png";
-DefenderTypes.push(alienHero);
+defenderTypes.push(alienHero);
 
 class Defender {
     // x and y as coordinates
@@ -211,38 +221,78 @@ class Defender {
         this.frameY = 0; // only needed in multi-row sprite sheets
         this.minFrame = 0;
         this.maxFrame = 16;
-        this.spriteWidth = 194;
-        this.spriteHeight = 194;
+        // allow different sprites to have different dimensions
+        this.chosenDefender = chosenDefender
+        if (this.chosenDefender === 1) {
+            this.spriteWidth = 194;
+            this.spriteHeight = 194;
+        } else if (this.chosenDefender === 2) {
+            this.spriteWidth = 567;
+            this.spriteHeight = 566;
+        }
     }
     draw() {
-        ctx.fillStyle = "blue";
-        ctx.fillRect(this.x, this.y, this.width, this.height);
-        ctx.fillStyle = "gold";
+        // ctx.fillStyle = "blue";
+        // ctx.fillRect(this.x, this.y, this.width, this.height);
+        ctx.fillStyle = "black";
         ctx.font = "30px Orbitron";
         ctx.fillText(Math.floor(this.health), this.x + 15, this.y + 30); // health wrapped in Math.floor() so we only use whole numbers
+        if (this.chosenDefender === 1) {
+            ctx.drawImage(alienHero, this.frameX * this.spriteWidth, 0, this.spriteWidth, this.spriteHeight, 
+                this.x, this.y, this.width, this.height)
+        } else if (this.chosenDefender === 2) {
+            ctx.drawImage(robotHero, this.frameX * this.spriteWidth, 0, this.spriteWidth, this.spriteHeight, 
+                this.x, this.y, this.width, this.height)
+        }
         // ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh) // s = source, d = destination
-        ctx.drawImage(alienHero, this.frameX * this.spriteWidth, 0, this.spriteWidth, this.spriteHeight, 
-            this.x, this.y, this.width, this.height)
+        
     }
     update() {
-        if (frame % 5 === 0) {
-            if (this.frameX < this.maxFrame) {
-                this.frameX++;
-            } else {
-                this.frameX = this.minFrame;
+        if (this.chosenDefender === 1) {
+            if (frame % 5 === 0) {
+                if (this.frameX < this.maxFrame) {
+                    this.frameX++;
+                } else {
+                    this.frameX = this.minFrame;
+                }
+                if (this.frameX === 15) {
+                    this.shootNow = true;
+                }
             }
-            if (this.frameX === 15) {
-                this.shootNow = true;
+        }
+        else if (this.chosenDefender === 2) {
+            if (frame % 10 === 0) {
+                if (this.frameX < this.maxFrame) {
+                    this.frameX++;
+                } else {
+                    this.frameX = this.minFrame;
+                }
+                if (this.frameX === 10) {
+                    this.shootNow = true;
+                }
             }
         }
 
-        // seperate shooting from idle frames
-        if (this.shooting == true) {
-            this.minFrame = 0;
-            this.maxFrame = 15;
-        } else {
-            this.minFrame = 17;
-            this.maxFrame = 23;
+
+        // seperate defenders if frames are different
+        if (this.chosenDefender === 1) {
+            // seperate "shooting" from "idle" frames
+            if (this.shooting == true) {
+                this.minFrame = 0;
+                this.maxFrame = 16;
+            } else {
+                this.minFrame = 17;
+                this.maxFrame = 24;
+            }
+        }
+        else if (this.chosenDefender === 2) {
+            if (this.shooting == true) {
+                this.minFrame = 10;
+                this.maxFrame = 13;
+            } else {
+                this.minFrame = 0;
+                this.maxFrame = 9;
+            }
         }
 
         if (this.shooting && this.shootNow == true) {
@@ -295,10 +345,38 @@ const card2 = {
 }
 
 function chooseDefender() {
+    ctx.lineWidth = 1;
+    
+    let card1Stroke = "black";
+    let card2Stroke = "black";
+    if (collision(mouse, card1) && mouse.clicked) {
+        chosenDefender = 1;
+    } else if (collision(mouse, card2) && mouse.clicked) {
+        chosenDefender = 2
+    }
+    if (chosenDefender === 1) {
+        card1Stroke = "gold"
+        card2Stroke = "black"
+    } else if (chosenDefender === 2) {
+        card1Stroke = "black"
+        card2Stroke = "gold"
+    } else {
+        card1Stroke = "black"
+        card2Stroke = "black"        
+    }
 
+    ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+
+    ctx.fillRect(card1.x, card1.y, card1.width, card1.height);
+    ctx.strokeStyle = card1Stroke;
+    ctx.strokeRect(card1.x, card1.y, card1.width, card1.height);
+    ctx.drawImage(alienHero, 0, 0, 194, 194, 0, 5, 194/2, 194/2);
+
+    ctx.fillRect(card2.x, card2.y, card2.width, card2.height);
+    ctx.strokeStyle = card2Stroke;
+    ctx.strokeRect(card2.x, card2.y, card2.width, card2.height);
+    ctx.drawImage(robotHero, 0, 0, 567, 566, 80, 5, 194/2, 194/2);
 }
-
-
 
 
 
@@ -312,12 +390,12 @@ function chooseDefender() {
 
 //====================== Enemies ======================//
 const enemyTypes = [ ];
-const enemie1 = new Image();
-enemie1.src = "./sprites/Compacted-Sprites/Enemies/Alien1-Walk.png";
-enemyTypes.push(enemie1);
-const enemie2 = new Image();
-enemie2.src = "./sprites/Compacted-Sprites/Enemies/Alien2-Walk.png";
-enemyTypes.push(enemie2);
+const enemy1 = new Image();
+enemy1.src = "./sprites/Compacted-Sprites/Enemies/Alien1-Walk.png";
+enemyTypes.push(enemy1);
+const enemy2 = new Image();
+enemy2.src = "./sprites/Compacted-Sprites/Enemies/Alien2-Walk.png";
+enemyTypes.push(enemy2);
 
 class Enemy {
     constructor(verticalPosition) {
@@ -333,9 +411,21 @@ class Enemy {
         this.frameX = 0;
         this.frameY = 0; // only needed in multi-row sprite sheets
         this.minFrame = 0;
-        this.maxFrame = 4;
-        this.spriteWidth = 160;
-        this.spriteHeight = 160;
+        // allow different sprites to have different amount of frames
+        if (this.enemyType === enemy1) {
+            this.maxFrame = 4;
+        } else if (this.enemyType === enemy2) {
+            this.maxFrame = 5;
+        }
+        // allow different sprites to have different dimensions
+        if (this.enemyType === enemy1) {
+            this.spriteWidth = 160;
+            this.spriteHeight = 160;
+        } else if (this.enemyType === enemy2) {
+            this.spriteWidth = 192;
+            this.spriteHeight = 192;
+        }
+        
     }
     update() {
         this.x -= this.movement;
@@ -370,7 +460,7 @@ function handleEnemies() {
         if (enemies[i].health <= 0) {
             let gainedResources = enemies[i].maxHealth / 5;
             floatingMessages.push(new FloatingMessage(`+${gainedResources}`, enemies[i].x, enemies[i].y, 30, "black"))
-            floatingMessages.push(new FloatingMessage(`+${gainedResources}`, 250, 50, 30, "gold"))
+            floatingMessages.push(new FloatingMessage(`+${gainedResources}`, 480, 80, 30, "gold"))
             resourcesCount += gainedResources; // rewards the player with resources for each vanquished foe
             score += gainedResources;
             const findThisIndex = enemyPositions.indexOf(enemies[i].y);
@@ -424,7 +514,7 @@ function handleResources() {
         if (resources[i] && mouse.x && mouse.y && collision(resources[i], mouse)) {
             resourcesCount += resources[i].amount;
             floatingMessages.push(new FloatingMessage(`+${resources[i].amount}`, resources[i].x, resources[i].y, 30, "black"));
-            floatingMessages.push(new FloatingMessage(`+${resources[i].amount}`, 250, 50, 30, "gold"))
+            floatingMessages.push(new FloatingMessage(`+${resources[i].amount}`, 480, 80, 30, "gold"))
             resources.splice(i, 1);
             i--;
         }
@@ -441,8 +531,8 @@ function handleResources() {
 function handleGameSatus() {
     ctx.fillStyle = "gold";
     ctx.font = "30px Orbitron";
-    ctx.fillText(`Score: ${score}`, 20, 40);
-    ctx.fillText(`Resources: ${resourcesCount}`, 20, 80);
+    ctx.fillText(`Score: ${score}`, 200, 40);
+    ctx.fillText(`Resources: ${resourcesCount}`, 200, 80);
     if (gameOver) {
         ctx.fillStyle = "black";
         ctx.font = "90px Orbitron";
@@ -488,6 +578,7 @@ function animate() {
     handleResources();
     handleProjectiles();
     handleEnemies();
+    chooseDefender()
     handleGameSatus();
     handleFloatingMessages();
     frame++;
