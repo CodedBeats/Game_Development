@@ -1,4 +1,4 @@
-//====================== Set Up Canvas ======================//
+//====================== Canvas Set Up ======================//
 const canvas = document.getElementById("canvas1");
 // ctx means context
 const ctx = canvas.getContext("2d");
@@ -15,7 +15,7 @@ let resourcesCount = 300; // initial given resource or money amount
 let frame = 0;
 let gameOver = false; 
 let score = 0;
-const winningScore = 200;
+const winningScore = 500;
 
 const gameGrid = [];
 const defenders = [];
@@ -253,7 +253,11 @@ function handleDefenders() {
 
 
 //====================== Enemies ======================//
-// class for creating new enemies
+const enemyTypes = [ ];
+const zombie1 = new Image();
+zombie1.src = "./sprites/Compacted-Sprites/zombie-walk.png";
+enemyTypes.push(zombie1)
+
 class Enemy {
     constructor(verticalPosition) {
         this.x = canvas.width;
@@ -264,9 +268,23 @@ class Enemy {
         this.movement = this.speed;
         this.health = 100;
         this.maxHealth = this.health; // this is defined twice because the damage needs to be stored by changing reducing health, helps with rewarding resources  
+        this.enemyType = enemyTypes[0];
+        this.frameX = 0;
+        this.frameY = 0; // only needed in multi-row sprite sheets
+        this.minFrame = 0;
+        this.maxFrame = 9;
+        this.spriteWidth = 430;
+        this.spriteHeight = 519;
     }
     update() {
         this.x -= this.movement;
+        if (frame % 10 === 0) {
+            if (this.frameX < this.maxFrame) {
+                this.frameX++;
+            } else {
+                this.frameX = this.minFrame;
+            }
+        }
     }
     draw() {
         ctx.fillStyle = "red";
@@ -274,6 +292,9 @@ class Enemy {
         ctx.fillStyle = "black";
         ctx.font = "30px Orbitron";
         ctx.fillText(Math.floor(this.health), this.x + 15, this.y + 30); // health wrapped in Math.floor() so we only use whole numbers
+        // ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh) // s = source, d = destination
+        ctx.drawImage(this.enemyType, this.frameX * this.spriteWidth, 0, this.spriteWidth, this.spriteHeight, 
+            this.x, this.y, this.width, this.height);
     }
 }
 
@@ -286,7 +307,7 @@ function handleEnemies() {
         }
         // check if enemy's health has reached 0 (damaged by projectiles)
         if (enemies[i].health <= 0) {
-            let gainedResources = enemies[i].maxHealth / 10;
+            let gainedResources = enemies[i].maxHealth / 5;
             floatingMessages.push(new FloatingMessage(`+${gainedResources}`, enemies[i].x, enemies[i].y, 30, "black"))
             floatingMessages.push(new FloatingMessage(`+${gainedResources}`, 250, 50, 30, "gold"))
             resourcesCount += gainedResources; // rewards the player with resources for each vanquished foe
