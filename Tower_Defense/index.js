@@ -186,7 +186,15 @@ function handleFloatingMessages() {
 
 
 //====================== Defenders ======================//
-// class for creating new "defender" or "tower"
+
+const DefenderTypes = [ ];
+const robotHero = new Image();
+robotHero.src = "./sprites/Compacted-Sprites/Heroes/robot-hero.png";
+DefenderTypes.push(robotHero);
+const alienHero = new Image();
+alienHero.src = "./sprites/Compacted-Sprites/Heroes/alien-hero1.png";
+DefenderTypes.push(alienHero);
+
 class Defender {
     // x and y as coordinates
     constructor(x, y) {
@@ -195,9 +203,16 @@ class Defender {
         this.width = cellSize - cellGap * 2;
         this.height = cellSize - cellGap * 2;
         this.shooting = false; // default state
+        this.shootNow = false;
         this.health = 100; // starting health
         this.projectiles = [];
         this.timer = 0;
+        this.frameX = 0;
+        this.frameY = 0; // only needed in multi-row sprite sheets
+        this.minFrame = 0;
+        this.maxFrame = 16;
+        this.spriteWidth = 194;
+        this.spriteHeight = 194;
     }
     draw() {
         ctx.fillStyle = "blue";
@@ -205,15 +220,34 @@ class Defender {
         ctx.fillStyle = "gold";
         ctx.font = "30px Orbitron";
         ctx.fillText(Math.floor(this.health), this.x + 15, this.y + 30); // health wrapped in Math.floor() so we only use whole numbers
+        // ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh) // s = source, d = destination
+        ctx.drawImage(alienHero, this.frameX * this.spriteWidth, 0, this.spriteWidth, this.spriteHeight, 
+            this.x, this.y, this.width, this.height)
     }
     update() {
-        if (this.shooting == true) {
-            this.timer++;
-            if (this.timer % 100 === 0) {
-                projectiles.push(new Projectile(this.x + 70, this.y + 50));
+        if (frame % 5 === 0) {
+            if (this.frameX < this.maxFrame) {
+                this.frameX++;
+            } else {
+                this.frameX = this.minFrame;
             }
+            if (this.frameX === 15) {
+                this.shootNow = true;
+            }
+        }
+
+        // seperate shooting from idle frames
+        if (this.shooting == true) {
+            this.minFrame = 0;
+            this.maxFrame = 15;
         } else {
-            this.timer = 0;
+            this.minFrame = 17;
+            this.maxFrame = 23;
+        }
+
+        if (this.shooting && this.shootNow == true) {
+            projectiles.push(new Projectile(this.x + 70, this.y + 35));
+            this.shootNow = false;
         }
     }
 }
@@ -247,6 +281,30 @@ function handleDefenders() {
 }
 
 
+const card1 = {
+    x: 10,
+    y: 10,
+    width: 70,
+    height: 85,
+}
+const card2 = {
+    x: 90,
+    y: 10,
+    width: 70,
+    height: 85,
+}
+
+function chooseDefender() {
+
+}
+
+
+
+
+
+
+
+
 
 
 
@@ -254,9 +312,12 @@ function handleDefenders() {
 
 //====================== Enemies ======================//
 const enemyTypes = [ ];
-const zombie1 = new Image();
-zombie1.src = "./sprites/Compacted-Sprites/zombie-walk.png";
-enemyTypes.push(zombie1)
+const enemie1 = new Image();
+enemie1.src = "./sprites/Compacted-Sprites/Enemies/Alien1-Walk.png";
+enemyTypes.push(enemie1);
+const enemie2 = new Image();
+enemie2.src = "./sprites/Compacted-Sprites/Enemies/Alien2-Walk.png";
+enemyTypes.push(enemie2);
 
 class Enemy {
     constructor(verticalPosition) {
@@ -268,17 +329,17 @@ class Enemy {
         this.movement = this.speed;
         this.health = 100;
         this.maxHealth = this.health; // this is defined twice because the damage needs to be stored by changing reducing health, helps with rewarding resources  
-        this.enemyType = enemyTypes[0];
+        this.enemyType = enemyTypes[Math.floor(Math.random() * enemyTypes.length)]; // randomize which sprite spawns
         this.frameX = 0;
         this.frameY = 0; // only needed in multi-row sprite sheets
         this.minFrame = 0;
-        this.maxFrame = 9;
-        this.spriteWidth = 430;
-        this.spriteHeight = 519;
+        this.maxFrame = 4;
+        this.spriteWidth = 160;
+        this.spriteHeight = 160;
     }
     update() {
         this.x -= this.movement;
-        if (frame % 10 === 0) {
+        if (frame % 9 === 0) {
             if (this.frameX < this.maxFrame) {
                 this.frameX++;
             } else {
@@ -287,8 +348,8 @@ class Enemy {
         }
     }
     draw() {
-        ctx.fillStyle = "red";
-        ctx.fillRect(this.x, this.y, this.width, this.height);
+        // ctx.fillStyle = "red";
+        // ctx.fillRect(this.x, this.y, this.width, this.height);
         ctx.fillStyle = "black";
         ctx.font = "30px Orbitron";
         ctx.fillText(Math.floor(this.health), this.x + 15, this.y + 30); // health wrapped in Math.floor() so we only use whole numbers
